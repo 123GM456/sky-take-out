@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/sky_take_out?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 050826
+
+mybatis:
+  # mapper 映射文件路径
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.sky.entity
+  configuration:
+    # 开启驼峰命名映射（如 user_name -> userName）
+    map-underscore-to-camel-case: true
+
+sky:
+  jwt:
+    # 管理端员工登录的 JWT 密钥
+    admin-secret-key: sky-take-out-admin-secret-key-2024
+    # 令牌过期时间（毫秒），默认 2 小时
+    admin-ttl: 7200000
+    # 令牌名称
+    admin-token-name: token

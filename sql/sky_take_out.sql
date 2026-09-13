@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS order_detail (
 
 -- ============================================================
 -- 初始化数据：插入默认管理员账号
--- 密码为明文（初始阶段，后续会改为加密方式）
+-- 密码使用 MD5 加密存储
 -- ============================================================
 INSERT INTO employee (username, password, name, phone, sex, id_number, status, create_time, update_time, create_user, update_user)
-VALUES ('root', '050826', '管理员', NULL, NULL, NULL, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1);
+VALUES ('root', 'e1379cca1d557ab7b36f4019863aab2a', '管理员', NULL, NULL, NULL, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1);
