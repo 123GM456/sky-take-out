@@ -27,6 +27,8 @@ import org.springframework.web.method.HandlerMethod;
 // Spring MVC：拦截器接口，实现 preHandle / afterCompletion 方法
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.naming.Context;
+
 /**
  * 管理端 JWT 令牌校验拦截器（HandlerInterceptor）。
  * <p>拦截 /admin/** 请求，从请求头中提取 token 并验证签名和有效期。
@@ -56,6 +58,8 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) {
+        // 打印当前线程 ID
+        System.out.println("当前线程的id：" + Thread.currentThread().getId());
 
         // 非 HandlerMethod（如静态资源、预检请求）直接放行，不校验令牌
         if (!(handler instanceof HandlerMethod)) {
@@ -80,6 +84,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             // 将当前登录员工 ID 存入 ThreadLocal，后续 Controller/Service 中可直接通过 BaseContext 获取
             BaseContext.setCurrentId(employeeId);
             log.info("管理端令牌验证通过，employeeId={}", employeeId);
+            BaseContext.setCurrentId(employeeId);
 
             return true;
 

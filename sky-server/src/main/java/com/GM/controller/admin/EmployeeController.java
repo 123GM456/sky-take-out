@@ -2,6 +2,8 @@ package com.GM.controller.admin;
 
 // 项目 DTO：接收登录请求的请求体（username + password）
 import com.GM.dto.EmployeeLoginDTO;
+// 项目 DTO：接收新增员工请求的请求体（username + name + phone + sex + idNumber）
+import com.GM.dto.EmployeeDTO;
 // 项目 DTO：接收分页查询参数（page、pageSize、name）
 import com.GM.dto.EmployeePageQueryDTO;
 // 项目工具：统一响应封装（所有的 Controller 方法统一返回 Result<T>）
@@ -100,11 +102,13 @@ public class EmployeeController {
      * @return code=1 时 data 为 null，code=0 时 msg 为错误原因
      */
     // Spring MVC：映射 HTTP POST 请求到 /admin/employee/save
-    @PostMapping("/save")
-    // @RequestBody：将请求体中的 JSON 自动反序列化为 EmployeeDTO 对象
+    @PostMapping
     public Result save(@RequestBody EmployeeDTO employeeDTO) {
-        log.info("员工新增请求：username={}", employeeDTO.getUsername());
+        log.info("新增员工：{}", employeeDTO);
+        System.out.println("当前线程的id：" + Thread.currentThread().getId());
+        employeeService.save(employeeDTO);
         return Result.success();
     }
+
 
 }

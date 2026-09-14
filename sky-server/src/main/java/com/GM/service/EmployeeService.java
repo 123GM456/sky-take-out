@@ -1,13 +1,16 @@
 package com.GM.service;
 
 // 项目 DTO：接收前端登录请求体（用户名 + 密码）
+import com.GM.dto.EmployeeDTO;
 import com.GM.dto.EmployeeLoginDTO;
 // 项目 DTO：接收前端分页查询参数（page、pageSize、name）
 import com.GM.dto.EmployeePageQueryDTO;
 // 项目 VO：封装分页返回结果（total + records 列表）
+import com.GM.entity.Employee;
 import com.GM.result.PageResult;
 // 项目 VO：封装登录成功返回给前端的员工信息 + JWT 令牌
 import com.GM.vo.EmployeeLoginVO;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 
 /**
  * 员工业务逻辑接口。
@@ -31,5 +34,15 @@ public interface EmployeeService {
      * @return 分页结果（total + records）
      */
     PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * 员工新增。
+     *
+     * @param employeeDTO 员工新增信息（用户名 + 姓名 + 手机号 + 性别 + 身份证号）
+     */
+    void save(EmployeeDTO employeeDTO);
+
+
+
 
 }

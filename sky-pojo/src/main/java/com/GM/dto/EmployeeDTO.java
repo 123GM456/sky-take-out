@@ -16,6 +16,9 @@ public class EmployeeDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /** 员工 ID */
+    private Long id;
+
     /** 登录账号（唯一） */
     private String username;
 

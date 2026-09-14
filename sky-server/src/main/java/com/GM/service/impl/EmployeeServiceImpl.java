@@ -4,7 +4,11 @@ package com.GM.service.impl;
 import com.GM.constant.JwtClaimsConstant;
 // 项目常量：业务文案信息（如 "账号不存在"、"密码错误"），统一管理避免硬编码
 import com.GM.constant.MessageConstant;
+import com.GM.constant.PasswordConstant;
+import com.GM.constant.StatusConstant;
+import com.GM.context.BaseContext;
 // 项目 DTO：接收前端登录请求体（用户名 + 明文密码）
+import com.GM.dto.EmployeeDTO;
 import com.GM.dto.EmployeeLoginDTO;
 // 项目 DTO：接收前端分页查询参数（page、pageSize、name）
 import com.GM.dto.EmployeePageQueryDTO;
@@ -23,14 +27,15 @@ import com.GM.utils.JwtUtil;
 // 项目 VO：登录成功后返回的视图对象（含员工信息 + token）
 import com.GM.vo.EmployeeLoginVO;
 // Lombok：为 final 字段生成构造器注入（employeeMapper、jwtProperties 不需要手动 @Autowired）
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.DigestUtils;
 import lombok.RequiredArgsConstructor;
 // Lombok：为当前类生成 log 日志对象
 import lombok.extern.slf4j.Slf4j;
 // Spring：标记当前类为 Service 层组件，纳入 Spring 容器管理
 import org.springframework.stereotype.Service;
 // Spring：MD5 加密工具，spring-core 模块自带，无需额外依赖
-import org.springframework.util.DigestUtils;
-// JDK：用于构建 JWT claims（键值对容器）
+import java.time.LocalDateTime;
 import java.util.HashMap;
 // JDK：分页查询返回 List<Employee> 时使用
 import java.util.List;
@@ -124,6 +129,35 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employeePageQueryDTO.getName(), offset, employeePageQueryDTO.getPageSize());
         Long total = employeeMapper.countQuery(employeePageQueryDTO.getName());
         return new PageResult(total, records);
+    }
+
+    /**
+     * 新增员工。
+     * <p>DTO → Entity 属性拷贝，补充默认密码、状态、时间戳和操作人信息。</p>
+     *
+     * @param employeeDTO 前端提交的员工信息（不含 password、status 等系统字段）
+     */
+    @Override
+    public void save(EmployeeDTO employeeDTO) {
+        System.out.println("当前线程的id：" + Thread.currentThread().getId());
+        // DTO → Entity：将同名属性（username、name、phone、sex、idNumber）批量拷贝到 Employee 对象
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        // 使用默认密码（123456）MD5 加密后存入，新增员工时无需用户输入密码
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+        // 新员工默认启用（1），无需管理员手动开启
+        employee.setStatus(StatusConstant.ENABLE);
+        // 记录创建和修改时间
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        // 暂用固定值 10L 作为创建人和修改人 ID（后续改为从登录上下文获取）
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        // 插入数据库
+        employeeMapper.insert(employee);
     }
 
 }

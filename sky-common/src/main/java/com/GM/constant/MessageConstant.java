@@ -21,4 +21,7 @@ public class MessageConstant {
     /** 未知错误 */
     public static final String UNKNOWN_ERROR = "未知错误";
 
+    /** 用户名重复 */
+    public static final String USERNAME_DUPLICATE = "已存在，请重新输入";
+
 }
