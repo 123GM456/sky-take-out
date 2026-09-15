@@ -16,11 +16,17 @@ mybatis:
     # 开启驼峰命名映射（如 user_name -> userName）
     map-underscore-to-camel-case: true
 
+# PageHelper 分页插件配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
 sky:
   jwt:
     # 管理端员工登录的 JWT 密钥
     admin-secret-key: sky-take-out-admin-secret-key-2024
     # 令牌过期时间（毫秒），默认 2 小时
-    admin-ttl: 7200000
+    admin-ttl: 720000000
     # 令牌名称
     admin-token-name: token

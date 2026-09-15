@@ -7,9 +7,13 @@ import lombok.RequiredArgsConstructor;
 // Spring：@Configuration 注解所在包，标记当前类为配置类
 import org.springframework.context.annotation.Configuration;
 // Spring MVC：InterceptorRegistry，用于向 Spring MVC 注册自定义拦截器
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.cbor.MappingJackson2CborHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 // Spring MVC：WebMvcConfigurer 接口，通过实现它来扩展 Spring MVC 配置
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
  * Web MVC 配置类，注册拦截器、静态资源映射等全局组件。
@@ -34,6 +38,14 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(jwtTokenAdminInterceptor)
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/employee/login");
+    }
+
+    /**
+     * 拓展Spring MVC 消息转换器，用于处理 CBOR 格式的请求和响应。
+     */
+    protected void extendInterceptors(List<HttpMessageConverter> converters) {
+        MappingJackson2CborHttpMessageConverter cborConverter = new MappingJackson2CborHttpMessageConverter();
+        converters.add(cborConverter);
     }
 
 }

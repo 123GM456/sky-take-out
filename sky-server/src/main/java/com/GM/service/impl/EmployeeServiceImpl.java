@@ -1,6 +1,7 @@
 package com.GM.service.impl;
 
 // 项目常量：JWT 声明键名（EMPLOYEE_ID），用于生成/解析 token 时存取员工 ID
+
 import com.GM.constant.JwtClaimsConstant;
 // 项目常量：业务文案信息（如 "账号不存在"、"密码错误"），统一管理避免硬编码
 import com.GM.constant.MessageConstant;
@@ -26,6 +27,9 @@ import com.GM.service.EmployeeService;
 import com.GM.utils.JwtUtil;
 // 项目 VO：登录成功后返回的视图对象（含员工信息 + token）
 import com.GM.vo.EmployeeLoginVO;
+// PageHelper：分页插件，拦截下一条 SQL 自动加 LIMIT 和 COUNT
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 // Lombok：为 final 字段生成构造器注入（employeeMapper、jwtProperties 不需要手动 @Autowired）
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.DigestUtils;
@@ -37,10 +41,9 @@ import org.springframework.stereotype.Service;
 // Spring：MD5 加密工具，spring-core 模块自带，无需额外依赖
 import java.time.LocalDateTime;
 import java.util.HashMap;
-// JDK：分页查询返回 List<Employee> 时使用
-import java.util.List;
 // JDK：Map 类型，承载 JWT payload 数据
 import java.util.Map;
+import java.util.List;
 
 /**
  * 员工业务层实现。
@@ -124,10 +127,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     // @Override：通知编译器当前方法覆写了接口方法
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        int offset = (employeePageQueryDTO.getPage() - 1) * employeePageQueryDTO.getPageSize();
-        List<Employee> records = employeeMapper.pageQuery(
-                employeePageQueryDTO.getName(), offset, employeePageQueryDTO.getPageSize());
-        Long total = employeeMapper.countQuery(employeePageQueryDTO.getName());
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
+        List<Employee> list = employeeMapper.pageQuery(employeePageQueryDTO);
+        Page<Employee> page = (Page<Employee>) list;
+        long total = page.getTotal();
+        List<Employee> records = page.getResult();
         return new PageResult(total, records);
     }
 
@@ -152,7 +156,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setCreateTime(LocalDateTime.now());
         employee.setUpdateTime(LocalDateTime.now());
 
-        // 暂用固定值 10L 作为创建人和修改人 ID（后续改为从登录上下文获取）
+        // 创建人和修改人ID
         employee.setCreateUser(BaseContext.getCurrentId());
         employee.setUpdateUser(BaseContext.getCurrentId());
 

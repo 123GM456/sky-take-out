@@ -46,6 +46,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- PageHelper：MyBatis 分页插件，自动拦截 SQL 加 LIMIT -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
         <!-- JJWT：JWT 令牌生成与验证 -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

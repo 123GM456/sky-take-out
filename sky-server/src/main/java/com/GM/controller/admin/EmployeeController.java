@@ -7,6 +7,7 @@ import com.GM.dto.EmployeeDTO;
 // 项目 DTO：接收分页查询参数（page、pageSize、name）
 import com.GM.dto.EmployeePageQueryDTO;
 // 项目工具：统一响应封装（所有的 Controller 方法统一返回 Result<T>）
+import com.GM.entity.Employee;
 import com.GM.result.Result;
 // 项目工具：分页结果封装（含 total + records）
 import com.GM.result.PageResult;
@@ -80,7 +81,9 @@ public class EmployeeController {
     // Spring MVC：映射 HTTP GET 请求到 /admin/employee/page
     @GetMapping("/page")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
-        return Result.success(employeeService.pageQuery(employeePageQueryDTO));
+        log.info("分页查询员工：{}", employeePageQueryDTO);
+        PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(pageResult);
     }
 
     /**
@@ -109,6 +112,5 @@ public class EmployeeController {
         employeeService.save(employeeDTO);
         return Result.success();
     }
-
 
 }

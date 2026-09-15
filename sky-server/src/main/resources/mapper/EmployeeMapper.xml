@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.GM.mapper.EmployeeMapper">
+
+    <!--
+        按用户名查询员工。
+        getByUsername(String username)
+    -->
+    <select id="getByUsername" resultType="com.GM.entity.Employee">
+        SELECT * FROM employee
+        WHERE username = #{username}
+    </select>
+
+    <!--
+        员工分页查询（动态条件版）。
+
+        pageQuery(EmployeePageQueryDTO dto)
+
+        XML 动态 SQL 说明：
+        - <where>：自动处理 WHERE 关键字，多余 AND/OR 自动去除
+        - <if test="...">：仅当条件满足（非 null 且非空）时拼接该片段
+        - 不传 name → 查全部；传 name → 按姓名模糊匹配
+
+        ⚠️ 不要在这里写 LIMIT，PageHelper 在 Service 层自动拦截加
+    -->
+    <select id="pageQuery" resultType="com.GM.entity.Employee">
+        SELECT * FROM employee
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!--
+        新增员工。
+        insert(Employee employee)
+    -->
+    <insert id="insert">
+        INSERT INTO employee
+            (name, username, password, phone, sex, id_number, status,
+             create_time, update_time, create_user, update_user)
+        VALUES
+            (#{name}, #{username}, #{password}, #{phone}, #{sex}, #{idNumber}, #{status},
+             #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+    </insert>
+
+</mapper>
