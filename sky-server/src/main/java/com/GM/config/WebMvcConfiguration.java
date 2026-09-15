@@ -45,7 +45,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
      */
     protected void extendInterceptors(List<HttpMessageConverter> converters) {
         MappingJackson2CborHttpMessageConverter cborConverter = new MappingJackson2CborHttpMessageConverter();
-        converters.add(cborConverter);
+        converters.setObjectMapper(new JacksonObjectMapper());
     }
 
 }
