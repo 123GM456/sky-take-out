@@ -4,14 +4,7 @@
 
 <mapper namespace="com.GM.mapper.EmployeeMapper">
 
-    <!--
-        按用户名查询员工。
-        getByUsername(String username)
-    -->
-    <select id="getByUsername" resultType="com.GM.entity.Employee">
-        SELECT * FROM employee
-        WHERE username = #{username}
-    </select>
+
 
     <!--
         员工分页查询（动态条件版）。
@@ -41,11 +34,35 @@
     -->
     <insert id="insert">
         INSERT INTO employee
-            (name, username, password, phone, sex, id_number, status,
-             create_time, update_time, create_user, update_user)
-        VALUES
-            (#{name}, #{username}, #{password}, #{phone}, #{sex}, #{idNumber}, #{status},
-             #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
+        (name, username, password, phone, sex, id_number, status,
+         create_time, update_time, create_user, update_user)
+        VALUES (#{name}, #{username}, #{password}, #{phone}, #{sex}, #{idNumber}, #{status},
+                #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
     </insert>
 
+    <!--
+        删除员工。
+        deleteById(Long id)
+    -->
+    <delete id="deleteById">
+        DELETE FROM employee WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.GM.entity.Employee">
+        UPDATE employee
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createUser != null">create_user = #{createUser},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+            <if test="idNumber != null">id_number = #{idNumber},</if>
+            <if test="password != null">password = #{password},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
 </mapper>

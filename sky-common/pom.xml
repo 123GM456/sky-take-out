@@ -25,6 +25,16 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Jackson：JSON 序列化/反序列化 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
         <!-- JJWT：JWT 令牌生成与验证 -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

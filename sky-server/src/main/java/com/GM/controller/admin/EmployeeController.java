@@ -1,6 +1,7 @@
 package com.GM.controller.admin;
 
 // 项目 DTO：接收登录请求的请求体（username + password）
+
 import com.GM.dto.EmployeeLoginDTO;
 // 项目 DTO：接收新增员工请求的请求体（username + name + phone + sex + idNumber）
 import com.GM.dto.EmployeeDTO;
@@ -20,15 +21,12 @@ import lombok.RequiredArgsConstructor;
 // Lombok：为当前类生成 log 日志对象
 import lombok.extern.slf4j.Slf4j;
 // Spring MVC：映射 HTTP GET 请求到处理方法
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 // Spring MVC：映射 HTTP POST 请求到处理方法
-import org.springframework.web.bind.annotation.PostMapping;
 // Spring MVC：将 HTTP 请求体中的 JSON 绑定到方法参数（@RequestBody EmployeeLoginDTO）
-import org.springframework.web.bind.annotation.RequestBody;
 // Spring MVC：在类级别定义路径前缀 @RequestMapping("/admin/employee")
-import org.springframework.web.bind.annotation.RequestMapping;
 // Spring MVC：标记当前类为 REST 风格控制器（@Controller + @ResponseBody 的组合）
-import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * 管理端 — 员工管理控制器（Controller 层）。
@@ -55,7 +53,7 @@ public class EmployeeController {
      *
      * @param employeeLoginDTO 登录请求体（用户名 + 明文密码）
      * @return code=1 时 data 为 EmployeeLoginVO（含 id、name、username、token）；
-     *         code=0 时 msg 为错误原因
+     * code=0 时 msg 为错误原因
      */
     // Spring MVC：映射 HTTP POST 请求到 /admin/employee/login
     @PostMapping("/login")
@@ -113,4 +111,65 @@ public class EmployeeController {
         return Result.success();
     }
 
+    /**
+     * 员工启停。
+     * <p>前端 POST 请求路径 /api/employee/startOrStop/{id}，Nginx 转发为 /admin/employee/startOrStop/{id}。
+     * 请求参数包含 status（1=启，0=停）。</p>
+     *
+     * @param status 启停状态（1=启，0=停）
+     * @param id     员工 id
+     * @return code=1 时 data 为 null，code=0 时 msg 为错误原因
+     */
+    // Spring MVC：映射 HTTP POST 请求到 /admin/employee/startOrStop/{id}
+    @PutMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("员工启停请求：{}, {}", status, id);
+        return Result.success();
+    }
+
+    /**
+     * 员工详情。
+     * <p>前端 GET 请求路径 /api/employee/{id}，Nginx 转发为 /admin/employee/{id}。</p>
+     *
+     * @param id 员工 id
+     * @return code=1 时 data 为 Employee（含 id、name、username、password、phone、sex、idNumber、status、createTime、updateTime、createUser、updateUser）
+     * code=0 时 msg 为错误原因
+     */
+    // Spring MVC：映射 HTTP GET 请求到 /admin/employee/{id}
+    @GetMapping("/{id}")
+    public Result<Employee> get(@PathVariable Long id) {
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    /**
+     * 员工更新。
+     * <p>前端 PUT 请求路径 /api/employee/update，Nginx 转发为 /admin/employee/update。
+     * 请求体包含员工信息。</p>
+     *
+     * @param employeeDTO 员工更新请求体（用户名 + 姓名 + 手机号 + 性别 + 身份证号）
+     * @return code=1 时 data 为 null，code=0 时 msg 为错误原因
+     */
+    // Spring MVC：映射 HTTP PUT 请求到 /admin/employee/update
+    @PutMapping
+    public Result update(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("更新员工：{}", employeeDTO);
+        employeeService.update(employeeDTO);
+        return Result.success();
+    }
+
+    /**
+     * 员工删除。
+     * <p>前端 DELETE 请求路径 /api/employee，Nginx 转发为 /admin/employee。</p>
+     *
+     * @param employeeDTO 员工 id（请求体中传 { "id": xxx }）
+     * @return code=1 时 data 为 null，code=0 时 msg 为错误原因
+     */
+    // Spring MVC：映射 HTTP DELETE 请求到 /admin/employee
+    @DeleteMapping
+    public Result delete(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("删除员工：{}", employeeDTO.getId());
+        employeeService.removeById(employeeDTO.getId());
+        return Result.success();
+    }
 }

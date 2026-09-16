@@ -164,4 +164,46 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.insert(employee);
     }
 
+    /**
+     * 启用/禁用员工。
+     */
+    // @Override：通知编译器当前方法覆写了接口方法
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                .id(id)
+                .status(status)
+                .build();
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 按 ID查询员工（登录后校验账号状态）。
+     */
+    @Override
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.selectById(id);
+        employee.setPassword(null);
+        return employee;
+    }
+
+    /**
+     * 更新员工信息。
+     */
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 删除员工。
+     */
+    @Override
+    public void removeById(Long id) {
+        employeeMapper.deleteById(id);
+    }
 }

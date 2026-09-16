@@ -6,6 +6,7 @@ import com.GM.dto.EmployeePageQueryDTO;
 import com.GM.entity.Employee;
 // MyBatis：声明 Mapper 接口，启动时自动扫描注册
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public interface EmployeeMapper {
     /**
      * 按用户名查询员工（登录时校验账号是否存在）。
      */
+    @Select("select * from employee where username = #{username}")
     Employee getByUsername(String username);
 
     /**
@@ -35,4 +37,13 @@ public interface EmployeeMapper {
      */
     void insert(Employee employee);
 
+    void update(Employee employee);
+
+    /**
+     * 按 ID查询员工（登录后校验账号状态）。
+     */
+    @Select("select * from employee where id = #{id}")
+    Employee selectById(Long id);
+
+    void deleteById(Long id);
 }

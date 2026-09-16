@@ -2,13 +2,14 @@ package com.GM.config;
 
 // 项目拦截器：自定义的管理端 JWT 校验拦截器，需要注册到拦截器链中
 import com.GM.interceptor.JwtTokenAdminInterceptor;
+import com.GM.json.JacksonObjectMapper;
 // Lombok：为 final 字段生成构造器注入（等价于手动 @Autowired）
 import lombok.RequiredArgsConstructor;
 // Spring：@Configuration 注解所在包，标记当前类为配置类
 import org.springframework.context.annotation.Configuration;
 // Spring MVC：InterceptorRegistry，用于向 Spring MVC 注册自定义拦截器
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.cbor.MappingJackson2CborHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 // Spring MVC：WebMvcConfigurer 接口，通过实现它来扩展 Spring MVC 配置
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -43,9 +44,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     /**
      * 拓展Spring MVC 消息转换器，用于处理 CBOR 格式的请求和响应。
      */
-    protected void extendInterceptors(List<HttpMessageConverter> converters) {
-        MappingJackson2CborHttpMessageConverter cborConverter = new MappingJackson2CborHttpMessageConverter();
-        converters.setObjectMapper(new JacksonObjectMapper());
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(new JacksonObjectMapper());
+        converters.add(0, converter);
     }
 
 }

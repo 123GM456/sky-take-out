@@ -7,6 +7,7 @@ import com.GM.dto.EmployeeLoginDTO;
 // 项目 DTO：接收前端分页查询参数（page、pageSize、name）
 import com.GM.dto.EmployeePageQueryDTO;
 // 项目结果：封装分页返回结果（total + records 列表）
+import com.GM.entity.Employee;
 import com.GM.result.PageResult;
 // 项目 VO：封装登录成功返回给前端的员工信息 + JWT 令牌
 import com.GM.vo.EmployeeLoginVO;
@@ -22,4 +23,11 @@ public interface EmployeeService {
 
     void save(EmployeeDTO employeeDTO);
 
+    void startOrStop(Integer status, Long id);
+
+    Employee getById(Long id);
+
+    void update(EmployeeDTO employeeDTO);
+
+    void removeById(Long id);
 }
