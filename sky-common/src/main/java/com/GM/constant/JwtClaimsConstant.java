@@ -1,15 +1,14 @@
 package com.GM.constant;
 
 /**
- * JWT 声明（Claims）的键名常量。
- * 用于在令牌 payload 中传递用户身份信息。
+ * JWT 声明（Claims）键名常量。
+ * <p>统一管理 JWT payload 中的 key，避免各处硬编码字符串。</p>
  */
 public class JwtClaimsConstant {
 
-    /** 员工用户 ID */
+    /** 员工用户 ID（管理端 token 中存储的 key） */
     public static final String EMPLOYEE_ID = "employeeId";
 
-    /** 微信用户 ID */
+    /** 微信用户 ID（用户端 token 中存储的 key） */
     public static final String USER_ID = "userId";
-
 }

@@ -1,26 +1,19 @@
 package com.GM.result;
 
-// Lombok：自动生成 getter/setter、toString、equals、hashCode（保持 code/msg/data 的读写能力）
 import lombok.Data;
-// JDK：实现 Serializable 接口，使 Result 对象可序列化（Redis 缓存 / 网络传输 / 序列化存储）
 import java.io.Serializable;
 
 /**
- * 统一返回结果封装。
- * 所有 Controller 接口统一使用此类包装响应数据，前端统一解析格式：
+ * 统一返回结果封装（Controller 层通用响应体）。
+ * <p>所有 Controller 方法统一返回此类型，前端按 code 判断业务成功/失败：</p>
  * <pre>
- * {
- *   "code": 1,       // 1=成功，0=失败
- *   "msg": "...",    // 提示信息
- *   "data": {}       // 数据载荷
- * }
+ * { "code": 1, "msg": "success", "data": ... }    // 成功
+ * { "code": 0, "msg": "错误信息",  "data": null }  // 失败
  * </pre>
  *
- * @param <T> 数据载荷的类型
+ * @param <T> data 字段的具体类型
  */
-// Lombok：自动生成 getter/setter、toString、equals、hashCode、canEqual
 @Data
-// 统一响应封装：所有 Controller 方法统一返回此类型，前端按 code 判断成功/失败
 public class Result<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -31,12 +24,10 @@ public class Result<T> implements Serializable {
     /** 提示信息 */
     private String msg;
 
-    /** 数据载荷 */
+    /** 数据载荷（成功时携带业务数据） */
     private T data;
 
-    /**
-     * 成功响应（无数据返回）。
-     */
+    /** 成功响应（无数据返回）。 */
     public static <T> Result<T> success() {
         Result<T> result = new Result<>();
         result.code = 1;
@@ -44,9 +35,7 @@ public class Result<T> implements Serializable {
         return result;
     }
 
-    /**
-     * 成功响应（携带数据）。
-     */
+    /** 成功响应（携带数据）。 */
     public static <T> Result<T> success(T data) {
         Result<T> result = new Result<>();
         result.code = 1;
@@ -57,7 +46,6 @@ public class Result<T> implements Serializable {
 
     /**
      * 失败响应。
-     *
      * @param msg 错误提示信息
      */
     public static <T> Result<T> error(String msg) {
@@ -66,5 +54,4 @@ public class Result<T> implements Serializable {
         result.msg = msg;
         return result;
     }
-
 }

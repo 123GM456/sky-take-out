@@ -1,39 +1,30 @@
 package com.GM.config;
 
-// 项目拦截器：自定义的管理端 JWT 校验拦截器，需要注册到拦截器链中
 import com.GM.interceptor.JwtTokenAdminInterceptor;
 import com.GM.json.JacksonObjectMapper;
-// Lombok：为 final 字段生成构造器注入（等价于手动 @Autowired）
 import lombok.RequiredArgsConstructor;
-// Spring：@Configuration 注解所在包，标记当前类为配置类
 import org.springframework.context.annotation.Configuration;
-// Spring MVC：InterceptorRegistry，用于向 Spring MVC 注册自定义拦截器
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-// Spring MVC：WebMvcConfigurer 接口，通过实现它来扩展 Spring MVC 配置
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import java.util.List;
 
 /**
- * Web MVC 配置类，注册拦截器、静态资源映射等全局组件。
- * <p>管理端所有 /admin/** 路径（登录接口除外）需要 JWT 令牌校验。</p>
+ * Web MVC 全局配置类（Config 层）。
+ * <p>注册管理端 JWT 校验拦截器，以及自定义的 Jackson 日期格式消息转换器。</p>
  */
-// Spring：标记为配置类，等价于 XML 配置中的 <beans/>
-@Configuration
-// Lombok：为 final 字段生成构造器注入
+@Configuration  // 标记为配置类，Spring 自动加载其中的 @Bean 和方法配置
 @RequiredArgsConstructor
-// 配置类：自定义 Spring MVC 全局配置（注册拦截器、路径映射等）
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private final JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
     /**
      * 注册管理端 JWT 校验拦截器。
-     * 拦截 /admin/** 下的所有请求，但排除 /admin/employee/login（登录不需要令牌）。
+     * <p>拦截 /admin/** 所有请求，排除登录接口（/admin/employee/login），
+     * 因为登录时还没有 token。</p>
      */
-    // Spring：标记当前方法重写/实现接口方法，编译器会验证签名是否匹配
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtTokenAdminInterceptor)
@@ -42,13 +33,14 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * 拓展Spring MVC 消息转换器，用于处理 CBOR 格式的请求和响应。
+     * 拓展 Spring MVC 消息转换器：将自定义的 JacksonObjectMapper 放在转换器链首位。
+     * <p>这样所有 Controller 返回的 LocalDateTime/LocalDate 等 Java 8 时间类型
+     * 都会按 yyyy-MM-dd HH:mm:ss 格式序列化，而不是默认的时间戳数组。</p>
      */
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(new JacksonObjectMapper());
-        converters.add(0, converter);
+        converters.add(0, converter);  // 放到首位，优先级最高
     }
-
 }

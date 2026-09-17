@@ -40,14 +40,6 @@
                 #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
     </insert>
 
-    <!--
-        删除员工。
-        deleteById(Long id)
-    -->
-    <delete id="deleteById">
-        DELETE FROM employee WHERE id = #{id}
-    </delete>
-
     <update id="update" parameterType="com.GM.entity.Employee">
         UPDATE employee
         <set>

@@ -1,23 +1,20 @@
 package com.GM.dto;
 
-// Lombok：自动生成 getter/setter、toString、equals、hashCode
 import lombok.Data;
 
 /**
- * 员工分页查询参数。
+ * 员工分页查询参数 DTO，接收前端分页请求的查询条件。
+ * <p>name 为空时查全部，非空时按姓名模糊匹配。</p>
  */
-// Lombok：自动生成 getter/setter、toString、equals、hashCode、canEqual
 @Data
-// DTO：接收前端分页查询参数（页码、每页条数、员工姓名），传到 Service 层
 public class EmployeePageQueryDTO {
 
-    /** 页码，从 1 开始 */
+    /** 页码（从 1 开始） */
     private Integer page;
 
-    /** 每页条数 */
+    /** 每页显示条数 */
     private Integer pageSize;
 
-    /** 员工姓名（模糊查询，可为空） */
+    /** 员工姓名（可选，传值时做模糊查询 LIKE %name%） */
     private String name;
-
 }

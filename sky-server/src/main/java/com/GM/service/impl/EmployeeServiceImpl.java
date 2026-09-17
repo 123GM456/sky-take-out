@@ -1,62 +1,40 @@
 package com.GM.service.impl;
 
-// 项目常量：JWT 声明键名（EMPLOYEE_ID），用于生成/解析 token 时存取员工 ID
-
 import com.GM.constant.JwtClaimsConstant;
-// 项目常量：业务文案信息（如 "账号不存在"、"密码错误"），统一管理避免硬编码
 import com.GM.constant.MessageConstant;
 import com.GM.constant.PasswordConstant;
 import com.GM.constant.StatusConstant;
 import com.GM.context.BaseContext;
-// 项目 DTO：接收前端登录请求体（用户名 + 明文密码）
 import com.GM.dto.EmployeeDTO;
 import com.GM.dto.EmployeeLoginDTO;
-// 项目 DTO：接收前端分页查询参数（page、pageSize、name）
 import com.GM.dto.EmployeePageQueryDTO;
-// 项目实体：员工 ORM 映射对象，MyBatis 查询结果映射为此类型
 import com.GM.entity.Employee;
-// 项目异常：登录失败时抛出自定义异常，由全局异常处理器统一捕获
 import com.GM.exception.LoginFailedException;
-// 项目 Mapper：数据访问层，查询数据库操作
 import com.GM.mapper.EmployeeMapper;
-// 项目工具：分页结果封装（total + records）
 import com.GM.result.PageResult;
-// 项目 Service：当前实现类所实现的接口
 import com.GM.service.EmployeeService;
-// 项目工具：JWT 令牌的创建和解析
 import com.GM.utils.JwtUtil;
-// 项目 VO：登录成功后返回的视图对象（含员工信息 + token）
 import com.GM.vo.EmployeeLoginVO;
-// PageHelper：分页插件，拦截下一条 SQL 自动加 LIMIT 和 COUNT
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-// Lombok：为 final 字段生成构造器注入（employeeMapper、jwtProperties 不需要手动 @Autowired）
-import org.springframework.beans.BeanUtils;
-import org.springframework.util.DigestUtils;
 import lombok.RequiredArgsConstructor;
-// Lombok：为当前类生成 log 日志对象
 import lombok.extern.slf4j.Slf4j;
-// Spring：标记当前类为 Service 层组件，纳入 Spring 容器管理
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-// Spring：MD5 加密工具，spring-core 模块自带，无需额外依赖
+import org.springframework.util.DigestUtils;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-// JDK：Map 类型，承载 JWT payload 数据
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 员工业务层实现。
- * <p>包含登录校验的核心逻辑：查用户 → 验密码 → 验状态 → 发令牌。
- * 密码使用 MD5 存储（苍穹外卖项目约定，非安全推荐，但便于教学演示）。</p>
+ * <p>包含登录校验的核心逻辑：查用户 → 验密码（MD5） → 验状态 → 发令牌。
+ * 密码使用 MD5 存储（苍穹外卖项目约定，便于教学演示，生产环境下推荐 BCrypt）。</p>
  */
-// Spring：标记为 Service 层 Bean，自动注册到 Spring 容器
-@Service
-// Lombok：为 final 字段生成构造器注入
-@RequiredArgsConstructor
-// Lombok：生成 log 日志对象
-@Slf4j
-// Service 实现：实现员工登录校验、分页查询等业务逻辑，调用 Mapper 操作数据库
+@Service                         // 标记为 Service 层 Bean，Spring 自动注册
+@RequiredArgsConstructor         // 为 final 字段生成构造器注入（替代 @Autowired）
+@Slf4j                           // 生成 log 对象（log.info / log.warn）
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeMapper employeeMapper;
@@ -65,15 +43,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 员工登录。
-     * <p>
-     * 校验流程：
-     * 1. 根据用户名查询员工
-     * 2. 校验员工是否存在
-     * 3. 校验密码（MD5 加密比较）
-     * 4. 校验账号状态
-     * 5. 生成 JWT 令牌返回
+     * <p>校验流程：查用户 → 验密码（MD5） → 验状态 → 发令牌。</p>
      */
-    // @Override：通知编译器当前方法覆写了接口方法，签名不一致时报错
     @Override
     public EmployeeLoginVO login(EmployeeLoginDTO employeeLoginDTO) {
         String username = employeeLoginDTO.getUsername();
@@ -122,9 +93,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /**
-     * 员工分页查询：按条件查当前页数据 + 统计总数。
+     * 员工分页查询（按条件查当前页数据 + 统计总数）。
      */
-    // @Override：通知编译器当前方法覆写了接口方法
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
@@ -137,37 +107,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 新增员工。
-     * <p>DTO → Entity 属性拷贝，补充默认密码、状态、时间戳和操作人信息。</p>
-     *
-     * @param employeeDTO 前端提交的员工信息（不含 password、status 等系统字段）
+     * <p>DTO → Entity 拷贝后，补充默认密码（123456 的 MD5）、启用状态、时间戳和操作人。</p>
      */
     @Override
     public void save(EmployeeDTO employeeDTO) {
-        System.out.println("当前线程的id：" + Thread.currentThread().getId());
-        // DTO → Entity：将同名属性（username、name、phone、sex、idNumber）批量拷贝到 Employee 对象
+        // DTO → Entity：将同名属性（username、name、phone、sex、idNumber）批量拷贝
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
 
-        // 使用默认密码（123456）MD5 加密后存入，新增员工时无需用户输入密码
+        // 使用默认密码（123456）MD5 加密后存入（新增员工时无需用户输入密码）
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        // 新员工默认启用（1），无需管理员手动开启
+        // 新员工默认启用
         employee.setStatus(StatusConstant.ENABLE);
         // 记录创建和修改时间
         employee.setCreateTime(LocalDateTime.now());
         employee.setUpdateTime(LocalDateTime.now());
-
-        // 创建人和修改人ID
+        // 记录当前登录的管理员 ID 作为创建人和修改人
         employee.setCreateUser(BaseContext.getCurrentId());
         employee.setUpdateUser(BaseContext.getCurrentId());
 
-        // 插入数据库
         employeeMapper.insert(employee);
     }
 
     /**
      * 启用/禁用员工。
+     * <p>利用 {@code Employee.builder()} 只设置 id 和 status，Mapper 的 {@code <set>} 动态 SQL
+     * 只会更新 status 字段，不会影响其他字段。</p>
      */
-    // @Override：通知编译器当前方法覆写了接口方法
     @Override
     public void startOrStop(Integer status, Long id) {
         Employee employee = Employee.builder()
@@ -178,7 +144,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /**
-     * 按 ID查询员工（登录后校验账号状态）。
+     * 按 ID 查询员工详情。
+     * <p>返回前将 password 置空，避免将敏感信息暴露给前端。</p>
      */
     @Override
     public Employee getById(Long id) {
@@ -189,6 +156,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 更新员工信息。
+     * <p>只更新 DTO 中非空字段（XML {@code <set>} 动态 SQL 实现），
+     * 自动补充修改时间和操作人。</p>
      */
     @Override
     public void update(EmployeeDTO employeeDTO) {
@@ -197,13 +166,5 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateTime(LocalDateTime.now());
         employee.setUpdateUser(BaseContext.getCurrentId());
         employeeMapper.update(employee);
-    }
-
-    /**
-     * 删除员工。
-     */
-    @Override
-    public void removeById(Long id) {
-        employeeMapper.deleteById(id);
     }
 }
