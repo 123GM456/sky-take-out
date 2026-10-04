@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "updatedAt": "2026-10-01T13:30:22.642Z",
+  "projects": {
+    "8831431": {
+      "branches": {},
+      "lastGuardError": {
+        "type": "guard_error",
+        "projectId": 8831431,
+        "message": "Automation caller branch required",
+        "createdAt": "2026-10-01T13:30:22.631Z"
+      },
+      "recentEvents": [
+        {
+          "type": "guard_error",
+          "projectId": 8831431,
+          "message": "Automation caller branch required",
+          "createdAt": "2026-10-01T13:30:22.631Z"
+        }
+      ]
+    }
+  },
+  "recentEvents": [
+    {
+      "type": "guard_error",
+      "projectId": 8831431,
+      "message": "Automation caller branch required",
+      "createdAt": "2026-10-01T13:30:22.631Z"
+    }
+  ]
+}
