@@ -1,44 +1,67 @@
 package com.GM.service.impl;
 
+import com.GM.constant.StatusConstant;
 import com.GM.dto.DishDTO;
 import com.GM.dto.DishPageQueryDTO;
 import com.GM.entity.Dish;
+import com.GM.entity.DishFlavor;
+import com.GM.mapper.DishFlavorMapper;
 import com.GM.mapper.DishMapper;
 import com.GM.result.PageResult;
 import com.GM.service.DishService;
+import com.GM.vo.DishVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Service
+/**
+ * 菜品业务逻辑实现（Service 层）。
+ */
+@Service                         // 标记为 Service 层 Bean，Spring 自动注册
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor         // 为 final 字段生成构造器注入
 public class DishServiceImpl implements DishService {
 
     private final DishMapper dishMapper;
 
+    private final DishFlavorMapper dishFlavorMapper;
+
+    /**
+     * 菜品分页查询。
+     * <p>使用 PageHelper 自动拦截下一条 SQL 添加 LIMIT。</p>
+     */
     @Override
     public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
-        List<Dish> list = dishMapper.pageQuery(dishPageQueryDTO);
-        Page<Dish> page = (Page<Dish>) list;
+        Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
         return new PageResult(page.getTotal(), page.getResult());
     }
 
+    /**
+     * 新增菜品。
+     * <p>DTO → Entity 拷贝后，记录创建/修改时间。</p>
+     */
     @Override
     public void save(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
+        dish.setStatus(StatusConstant.ENABLE);
         dish.setCreateTime(LocalDateTime.now());
         dish.setUpdateTime(LocalDateTime.now());
         dishMapper.insert(dish);
     }
 
+    /**
+     * 更新菜品。
+     * <p>只更新 DTO 中非空字段（XML <set> 动态 SQL 实现），自动补充修改时间。</p>
+     */
     @Override
     public void update(DishDTO dishDTO) {
         Dish dish = new Dish();
@@ -47,13 +70,52 @@ public class DishServiceImpl implements DishService {
         dishMapper.update(dish);
     }
 
+    /**
+     * 批量删除菜品。
+     */
     @Override
     public void deleteByIds(List<Long> ids) {
         dishMapper.deleteByIds(ids);
     }
 
+    /**
+     * 按 ID 查询菜品。
+     */
     @Override
-    public Dish getById(Long id) {
+    public DishVO getById(Long id) {
         return dishMapper.getById(id);
+    }
+
+    @Override
+    public List<Dish> list(Long categoryId) {
+        Dish dish = new Dish();
+        dish.setCategoryId(categoryId);
+        return dishMapper.listByCategoryId(dish);
+    }
+
+    @Override
+    public List<DishVO> listWithFlavor(Long categoryId) {
+        Dish dish = new Dish();
+        dish.setCategoryId(categoryId);
+        dish.setStatus(StatusConstant.ENABLE);
+        List<Dish> dishList = dishMapper.listByCategoryId(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+        for (Dish d : dishList) {
+            DishVO vo = new DishVO();
+            BeanUtils.copyProperties(d, vo);
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+            vo.setFlavors(flavors);
+            dishVOList.add(vo);
+        }
+        return dishVOList;
+    }
+
+    /**
+     * 起售/停售菜品。
+     */
+    @Override
+    public void setStatus(Integer status, Long id) {
+        dishMapper.setStatus(status, id);
     }
 }

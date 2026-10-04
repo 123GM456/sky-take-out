@@ -85,6 +85,18 @@
             <artifactId>sky-pojo</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- Spring Data Redis：Redis 操作封装（RedisTemplate、StringRedisTemplate）-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- Apache Commons Pool2：Redis 连接池（Lettuce 默认使用）-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

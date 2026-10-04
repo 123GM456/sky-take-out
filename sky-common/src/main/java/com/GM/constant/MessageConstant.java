@@ -9,6 +9,9 @@ public class MessageConstant {
     /** 登录成功 */
     public static final String LOGIN_SUCCESS = "登录成功";
 
+    /** 登录失败 */
+    public static final String LOGIN_FAILED = "登录失败";
+
     /** 密码错误 */
     public static final String PASSWORD_ERROR = "密码错误";
 

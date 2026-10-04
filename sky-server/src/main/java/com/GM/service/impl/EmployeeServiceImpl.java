@@ -11,6 +11,7 @@ import com.GM.dto.EmployeePageQueryDTO;
 import com.GM.entity.Employee;
 import com.GM.exception.LoginFailedException;
 import com.GM.mapper.EmployeeMapper;
+import com.GM.properties.JwtProperties;
 import com.GM.result.PageResult;
 import com.GM.service.EmployeeService;
 import com.GM.utils.JwtUtil;
@@ -39,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeMapper employeeMapper;
 
-    private final com.GM.config.JwtProperties jwtProperties;
+    private final JwtProperties jwtProperties;
 
     /**
      * 员工登录。
@@ -135,7 +136,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * 只会更新 status 字段，不会影响其他字段。</p>
      */
     @Override
-    public void startOrStop(Integer status, Long id) {
+    public void setStatus(Integer status, Long id) {
         Employee employee = Employee.builder()
                 .id(id)
                 .status(status)

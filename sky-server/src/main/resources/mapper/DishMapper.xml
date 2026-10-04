@@ -4,20 +4,22 @@
 
 <mapper namespace="com.GM.mapper.DishMapper">
 
-    <select id="pageQuery" resultType="com.GM.entity.Dish">
-        SELECT * FROM dish
+    <select id="pageQuery" resultType="com.GM.vo.DishVO">
+        SELECT d.*, c.name AS category_name
+        FROM dish d
+        LEFT JOIN category c ON d.category_id = c.id
         <where>
             <if test="name != null and name != ''">
-                AND name LIKE CONCAT('%', #{name}, '%')
+                AND d.name LIKE CONCAT('%', #{name}, '%')
             </if>
             <if test="categoryId != null">
-                AND category_id = #{categoryId}
+                AND d.category_id = #{categoryId}
             </if>
             <if test="status != null">
-                AND status = #{status}
+                AND d.status = #{status}
             </if>
         </where>
-        ORDER BY create_time DESC
+        ORDER BY d.create_time DESC
     </select>
 
     <insert id="insert" parameterType="com.GM.entity.Dish" useGeneratedKeys="true" keyProperty="id">
@@ -45,5 +47,26 @@
             #{id}
         </foreach>
     </delete>
+
+    <select id="list" resultType="com.GM.entity.Dish">
+        SELECT * FROM dish
+    </select>
+
+    <select id="listByCategoryId" parameterType="com.GM.entity.Dish" resultType="com.GM.entity.Dish">
+        SELECT * FROM dish
+        <where>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="setStatus">
+        UPDATE dish SET status = #{status} WHERE id = #{id}
+    </update>
 
 </mapper>

@@ -11,4 +11,11 @@ public class JwtClaimsConstant {
 
     /** 微信用户 ID（用户端 token 中存储的 key） */
     public static final String USER_ID = "userId";
+
+    public static final String PHONE = "phone";
+
+    public static final String USERNAME = "username";
+
+    public static final String NAME = "name";
+
 }

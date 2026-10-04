@@ -7,6 +7,18 @@ spring:
     url: jdbc:mysql://localhost:3306/sky_take_out?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
     password: 050826
+  data:
+    redis:
+      host: 172.30.215.133    # WSL IP，不是 localhost
+      port: 6379
+      password:                # 没有密码就空着
+      database: 0
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
 
 mybatis:
   # mapper 映射文件路径
@@ -25,8 +37,17 @@ pagehelper:
 sky:
   jwt:
     # 管理端员工登录的 JWT 密钥
-    admin-secret-key: sky-take-out-admin-secret-key-2024
+    admin-secret-key: sky-take-out-admin-secret-key-GM666
     # 令牌过期时间（毫秒），默认 2 小时
     admin-ttl: 720000000
     # 令牌名称
     admin-token-name: token
+
+    user-secret-key: sky-take-out-user-secret-key-GM666
+    user-ttl: 720000000
+    user-token-name: user-token
+  # 微信小程序配置
+  wechat:
+    app-id: wxb0d179c3dee82381
+    app-secret: ec860c2714fc0e09ec0ce15e9d623229
+    redirect-uri: https://localhost:8080/user/login

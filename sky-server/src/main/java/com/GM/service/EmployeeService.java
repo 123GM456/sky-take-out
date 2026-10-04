@@ -46,7 +46,7 @@ public interface EmployeeService {
      * @param status 目标状态：1=启用，0=禁用
      * @param id     目标员工 ID
      */
-    void startOrStop(Integer status, Long id);
+    void setStatus(Integer status, Long id);
 
     /**
      * 按 ID 查询员工详情。

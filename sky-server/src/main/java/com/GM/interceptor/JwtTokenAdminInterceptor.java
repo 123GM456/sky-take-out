@@ -2,7 +2,7 @@ package com.GM.interceptor;
 
 import com.GM.constant.JwtClaimsConstant;
 import com.GM.context.BaseContext;
-import com.GM.config.JwtProperties;
+import com.GM.properties.JwtProperties;
 import com.GM.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

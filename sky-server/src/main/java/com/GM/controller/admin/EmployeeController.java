@@ -88,9 +88,10 @@ public class EmployeeController {
      * @param id     员工 ID（请求参数，非路径变量）
      */
     // @PathVariable：从 URL 路径中提取 {status} 参数
-    @PutMapping("/status/{status}")
-    public Result startOrStop(@PathVariable Integer status, Long id) {
+    @PostMapping("/status/{status}")
+    public Result setStatus(@PathVariable Integer status, Long id) {
         log.info("员工启停请求：status={}, id={}", status, id);
+        employeeService.setStatus(status, id);
         return Result.success();
     }
 
