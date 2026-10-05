@@ -6,12 +6,18 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +55,7 @@ public class RedisConfiguration {
         template.setHashKeySerializer(stringSerializer);
 
         // 使用 GenericJackson2JsonRedisSerializer 序列化 value（value 是对象，需要转 JSON）
-        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
+        GenericJackson2JsonRedisSerializer jsonSerializer = jsonRedisSerializer();
         template.setValueSerializer(jsonSerializer);
         template.setHashValueSerializer(jsonSerializer);
 
@@ -57,6 +63,28 @@ public class RedisConfiguration {
         template.afterPropertiesSet();
 
         return template;
+    }
+
+    /**
+     * 构建支持 Java 8 时间类型的 JSON 序列化器。
+     * <p>GenericJackson2JsonRedisSerializer 默认的 ObjectMapper 未注册 JSR-310 模块，
+     * 序列化含 LocalDateTime 字段的对象（如 DishVO）会抛 SerializationException，
+     * 导致用户端菜品等接口整体失败。这里补注册 JavaTimeModule 并统一时间格式。</p>
+     *
+     * @return 可正确读写 LocalDateTime 的 JSON 序列化器
+     */
+    private GenericJackson2JsonRedisSerializer jsonRedisSerializer() {
+        return new GenericJackson2JsonRedisSerializer().configure(mapper -> {
+            // 不将日期写为时间戳数组，改用可读字符串
+            mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            // 与 JacksonObjectMapper 保持一致的 yyyy-MM-dd HH:mm:ss 格式
+            JavaTimeModule javaTimeModule = new JavaTimeModule();
+            javaTimeModule.addSerializer(LocalDateTime.class,
+                    new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            javaTimeModule.addDeserializer(LocalDateTime.class,
+                    new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            mapper.registerModule(javaTimeModule);
+        });
     }
 
     /**
@@ -75,7 +103,7 @@ public class RedisConfiguration {
                 .entryTtl(Duration.ofHours(1))                    // 默认缓存有效期 1 小时
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 // 设置 value 的序列化方式为 JSON（便于查看缓存内容）
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonRedisSerializer()))
                 // 禁用缓存空值（防止缓存穿透攻击）
                 .disableCachingNullValues();
 

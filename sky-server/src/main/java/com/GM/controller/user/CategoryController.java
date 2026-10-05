@@ -29,7 +29,10 @@ public class CategoryController {
     public Result<List<Category>> list(Integer type) {
         log.info("用户端查询分类列表：type={}", type);
         Category category = new Category();
-        category.setType((int) type.longValue());
+        // type 为空时不设置类型，表示查询全部分类
+        if (type != null) {
+            category.setType(type);
+        }
         category.setStatus(StatusConstant.ENABLE);
 
         List<Category> list = categoryService.list(category);

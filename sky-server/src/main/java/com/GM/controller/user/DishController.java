@@ -27,17 +27,20 @@ public class DishController {
     @GetMapping("/list")
     public Result<List<DishVO>> list(Long categoryId) {
 
+        String key = "dish_" + categoryId;
         //查询redis中有无菜品
+        List<DishVO> list = (List<DishVO>) redisTemplate.opsForValue().get(key);
+        if (list != null && list.size() > 0) {
+            return Result.success(list);
+        }
 
-        //如果redis中没有菜品，从数据库中查询
-
-        //将查询到的菜品缓存到redis中
         log.info("用户端查询菜品列表：categoryId={}", categoryId);
         Dish dish = new Dish();
         dish.setCategoryId(categoryId);
         dish.setStatus(StatusConstant.ENABLE);
-
-        List<DishVO> list = dishService.listWithFlavor(dish);
+        //如果redis中没有菜品，从数据库中查询
+        list = dishService.listWithFlavor(dish);
+        redisTemplate.opsForValue().set(key, list);
         return Result.success(list);
     }
 }
