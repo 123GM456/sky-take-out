@@ -47,4 +47,14 @@ public interface SetmealMapper {
      * 按 ID 查询套餐详情（XML 中 JOIN category 表获取分类名称）。
      */
     SetmealVO getById(Long id);
+
+    /**
+     * 用户端：根据条件查询起售套餐。
+     */
+    List<Setmeal> listByCategoryId(Setmeal setmeal);
+
+    /**
+     * 用户端：根据ID查询套餐详情（含分类名称，不含菜品列表）。
+     */
+    SetmealVO getUserById(Long id);
 }

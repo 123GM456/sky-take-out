@@ -57,4 +57,26 @@
         WHERE s.id = #{id}
     </select>
 
+    <!-- 用户端：根据条件查询起售套餐列表 -->
+    <select id="listByCategoryId" parameterType="com.GM.entity.Setmeal" resultType="com.GM.entity.Setmeal">
+        SELECT * FROM setmeal
+        <where>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 用户端：根据ID查询套餐详情（与getById相同，用于用户端） -->
+    <select id="getUserById" resultType="com.GM.vo.SetmealVO">
+        SELECT s.*, c.name AS category_name
+        FROM setmeal s
+        LEFT JOIN category c ON s.category_id = c.id
+        WHERE s.id = #{id}
+    </select>
+
 </mapper>

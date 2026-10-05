@@ -30,7 +30,7 @@ public interface EmployeeService {
      * @param employeePageQueryDTO 分页参数（page、pageSize、name）
      * @return 分页结果（total + 当前页记录列表）
      */
-    PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+    PageResult<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
     /**
      * 新增员工。

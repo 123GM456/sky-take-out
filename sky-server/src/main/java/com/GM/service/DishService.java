@@ -19,7 +19,7 @@ public interface DishService {
      * @param dishPageQueryDTO 分页参数（page、pageSize、name、categoryId、status）
      * @return 分页结果（total + 当前页记录列表）
      */
-    PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO);
+    PageResult<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
 
     /**
      * 新增菜品。
@@ -46,9 +46,9 @@ public interface DishService {
      */
     DishVO getById(Long id);
 
-    List<Dish> list(Long categoryId);
+    List<Dish> list(Dish dish);
 
-    List<DishVO> listWithFlavor(Long categoryId);
+    List<DishVO> listWithFlavor(Dish dish);
 
     /**
      * 起售/停售菜品。

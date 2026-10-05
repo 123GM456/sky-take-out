@@ -17,7 +17,7 @@ public interface CategoryService {
      * @param categoryPageQueryDTO 分页参数（page、pageSize、name、type）
      * @return 分页结果（total + 当前页记录列表）
      */
-    PageResult pageQuery(CategoryPageQueryDTO categoryPageQueryDTO);
+    PageResult<Category> pageQuery(CategoryPageQueryDTO categoryPageQueryDTO);
 
     /**
      * 新增分类。
@@ -56,5 +56,5 @@ public interface CategoryService {
      */
     Category getById(Long id);
 
-    List<Category> list(Long type);
+    List<Category> list(Category category);
 }

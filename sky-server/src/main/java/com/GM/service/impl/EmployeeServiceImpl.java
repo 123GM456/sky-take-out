@@ -97,13 +97,13 @@ public class EmployeeServiceImpl implements EmployeeService {
      * 员工分页查询（按条件查当前页数据 + 统计总数）。
      */
     @Override
-    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+    public PageResult<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
         List<Employee> list = employeeMapper.pageQuery(employeePageQueryDTO);
         Page<Employee> page = (Page<Employee>) list;
         long total = page.getTotal();
         List<Employee> records = page.getResult();
-        return new PageResult(total, records);
+        return new PageResult<>(total, records);
     }
 
     /**

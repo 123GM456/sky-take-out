@@ -41,9 +41,9 @@ public class DishController {
      * @param dishPageQueryDTO 分页参数（page、pageSize、name、categoryId、status）
      */
     @GetMapping("/page")
-    public Result<PageResult> page(DishPageQueryDTO dishPageQueryDTO) {
+    public Result<PageResult<DishVO>> page(DishPageQueryDTO dishPageQueryDTO) {
         log.info("菜品分页查询：{}", dishPageQueryDTO);
-        PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
+        PageResult<DishVO> pageResult = dishService.pageQuery(dishPageQueryDTO);
         return Result.success(pageResult);
     }
 
@@ -97,7 +97,11 @@ public class DishController {
      */
     @GetMapping
     public Result<List<Dish>> list(Long categoryId) {
-        List<Dish> list = dishService.list(categoryId);
+        log.info("管理端查询菜品列表：categoryId={}", categoryId);
+        Dish dish = new Dish();
+        dish.setCategoryId(categoryId);
+
+        List<Dish> list = dishService.list(dish);
         return Result.success(list);
     }
 

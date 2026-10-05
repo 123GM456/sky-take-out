@@ -42,7 +42,7 @@ public interface SetmealService {
      * @param setmealPageQueryDTO 分页参数（page、pageSize、name、categoryId、status）
      * @return 分页结果（total + 当前页记录列表）
      */
-    PageResult pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
+    PageResult<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 
     /**
      * 按 ID 查询套餐详情。
@@ -50,4 +50,18 @@ public interface SetmealService {
      * @return 套餐详情（含分类名称）
      */
     SetmealVO getById(Long id);
+
+    /**
+     * 用户端：根据条件查询起售套餐列表。
+     * @param setmeal 查询条件（categoryId、status等）
+     * @return 符合条件的套餐列表
+     */
+    List<Setmeal> list(Setmeal setmeal);
+
+    /**
+     * 用户端：根据ID查询套餐详情（含包含的菜品列表）。
+     * @param id 套餐ID
+     * @return 套餐详情（含套餐内菜品）
+     */
+    SetmealVO getByIdWithDish(Long id);
 }

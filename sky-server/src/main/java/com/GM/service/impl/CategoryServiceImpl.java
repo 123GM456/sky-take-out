@@ -31,11 +31,11 @@ public class CategoryServiceImpl implements CategoryService {
      * <p>使用 PageHelper 自动拦截下一条 SQL 添加 LIMIT，无需手动拼 SQL。</p>
      */
     @Override
-    public PageResult pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
+    public PageResult<Category> pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
         PageHelper.startPage(categoryPageQueryDTO.getPage(), categoryPageQueryDTO.getPageSize());
         List<Category> list = categoryMapper.pageQuery(categoryPageQueryDTO);
         Page<Category> page = (Page<Category>) list;
-        return new PageResult(page.getTotal(), page.getResult());
+        return new PageResult<>(page.getTotal(), page.getResult());
     }
 
     /**
@@ -89,7 +89,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> list(Long type) {
-        return categoryMapper.listByType(type);
+    public List<Category> list(Category category) {
+        return categoryMapper.listByType(category);
     }
 }

@@ -1,5 +1,6 @@
 package com.GM.controller.user;
 
+import com.GM.constant.StatusConstant;
 import com.GM.entity.Category;
 import com.GM.result.Result;
 import com.GM.service.CategoryService;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("userCategoryController")  // 指定 Bean 名称，避免与管理端同名 Controller 冲突
+@RestController("userCategoryController")
 @RequestMapping("/user/category")
 @RequiredArgsConstructor
 @Slf4j
@@ -19,9 +20,19 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    /**
+     * 查询分类列表。
+     *
+     * @param type 分类类型（可选）：1=菜品分类，2=套餐分类，不传则查全部启用的分类
+     */
     @GetMapping("/list")
-    public Result<List<Category>> list() {
-        List<Category> list = categoryService.list(1L);
+    public Result<List<Category>> list(Integer type) {
+        log.info("用户端查询分类列表：type={}", type);
+        Category category = new Category();
+        category.setType((int) type.longValue());
+        category.setStatus(StatusConstant.ENABLE);
+
+        List<Category> list = categoryService.list(category);
         return Result.success(list);
     }
 }

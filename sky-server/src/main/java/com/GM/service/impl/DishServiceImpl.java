@@ -38,7 +38,7 @@ public class DishServiceImpl implements DishService {
      * <p>使用 PageHelper 自动拦截下一条 SQL 添加 LIMIT。</p>
      */
     @Override
-    public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
+    public PageResult<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO) {
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
         Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
         return new PageResult(page.getTotal(), page.getResult());
@@ -87,17 +87,12 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public List<Dish> list(Long categoryId) {
-        Dish dish = new Dish();
-        dish.setCategoryId(categoryId);
+    public List<Dish> list(Dish dish) {
         return dishMapper.listByCategoryId(dish);
     }
 
     @Override
-    public List<DishVO> listWithFlavor(Long categoryId) {
-        Dish dish = new Dish();
-        dish.setCategoryId(categoryId);
-        dish.setStatus(StatusConstant.ENABLE);
+    public List<DishVO> listWithFlavor(Dish dish) {
         List<Dish> dishList = dishMapper.listByCategoryId(dish);
 
         List<DishVO> dishVOList = new ArrayList<>();

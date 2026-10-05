@@ -40,9 +40,9 @@ public class CategoryController {
      * @param categoryPageQueryDTO 分页参数（page、pageSize、name、type）
      */
     @GetMapping("/page")
-    public Result<PageResult> page(CategoryPageQueryDTO categoryPageQueryDTO) {
+    public Result<PageResult<Category>> page(CategoryPageQueryDTO categoryPageQueryDTO) {
         log.info("分类分页查询：{}", categoryPageQueryDTO);
-        PageResult pageResult = categoryService.pageQuery(categoryPageQueryDTO);
+        PageResult<Category> pageResult = categoryService.pageQuery(categoryPageQueryDTO);
         return Result.success(pageResult);
     }
 
@@ -93,7 +93,11 @@ public class CategoryController {
 
     @GetMapping
     public Result<List<Category>> list(Long type) {
-        List<Category> list = categoryService.list(type);
+        log.info("管理端查询分类列表：type={}", type);
+        Category category = new Category();
+        category.setType(type.intValue());
+
+        List<Category> list = categoryService.list(category);
         return Result.success(list);
     }
 }

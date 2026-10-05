@@ -74,9 +74,9 @@ public class SetmealController {
      * @param setmealPageQueryDTO 分页参数（page、pageSize、name、categoryId、status）
      */
     @GetMapping("/page")
-    public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO) {
+    public Result<PageResult<SetmealVO>> page(SetmealPageQueryDTO setmealPageQueryDTO) {
         log.info("套餐分页查询：{}", setmealPageQueryDTO);
-        PageResult pageResult = setmealService.pageQuery(setmealPageQueryDTO);
+        PageResult<SetmealVO> pageResult = setmealService.pageQuery(setmealPageQueryDTO);
         return Result.success(pageResult);
     }
 

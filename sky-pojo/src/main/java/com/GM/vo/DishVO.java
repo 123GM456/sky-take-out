@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +20,12 @@ public class DishVO implements Serializable {
 
     private Long id;
 
-    private String name;
-
     private Long categoryId;
+
+    /** 分类名称（冗余，前端展示用） */
+    private String categoryName;
+
+    private String name;
 
     private BigDecimal price;
 
@@ -31,7 +35,9 @@ public class DishVO implements Serializable {
 
     private Integer status;
 
-    private String categoryName;
+    private LocalDateTime createTime;
 
+    private LocalDateTime updateTime;
+    
     private List<DishFlavor> flavors=new ArrayList<>();
 }

@@ -49,5 +49,5 @@ public interface CategoryMapper {
     @Select("SELECT * FROM category WHERE id = #{id}")
     Category getById(Long id);
 
-    List<Category> listByType(@Param("type") Long type);
+    List<Category> listByType(Category category);
 }
