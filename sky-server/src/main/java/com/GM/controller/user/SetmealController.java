@@ -7,6 +7,8 @@ import com.GM.service.SetmealService;
 import com.GM.vo.SetmealVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +30,8 @@ public class SetmealController {
      * @param categoryId 套餐分类ID
      */
     @GetMapping("/list")
+    // 缓存键：根据套餐分类ID动态生成，避免缓存穿透
+    @Cacheable(cacheNames = "setmealCache", key = "#categoryId")
     public Result<List<Setmeal>> list(Long categoryId) {
         log.info("用户端查询套餐列表：categoryId={}", categoryId);
         Setmeal setmeal = new Setmeal();

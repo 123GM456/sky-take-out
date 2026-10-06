@@ -8,6 +8,9 @@ import com.GM.service.SetmealService;
 import com.GM.vo.SetmealVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +31,9 @@ public class SetmealController {
      * 新增套餐。
      */
     @PostMapping
+    // 新增套餐后，需要刷新套餐列表缓存
+    @CacheEvict(cacheNames = "setmealCache", key = "#setmeal.categoryId")
+    // 缓存键：根据套餐分类ID动态生成，避免缓存穿透
     public Result<Setmeal> save(@RequestBody Setmeal setmeal) {
         setmealService.save(setmeal);
         return Result.success(setmeal);
@@ -37,6 +43,8 @@ public class SetmealController {
      * 修改套餐。
      */
     @PutMapping
+    // 修改套餐后，需要刷新套餐列表缓存
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
     public Result<Setmeal> update(@RequestBody Setmeal setmeal) {
         setmealService.update(setmeal);
         return Result.success(setmeal);
@@ -49,6 +57,8 @@ public class SetmealController {
      * @param id     套餐 ID
      */
     @PostMapping("/status/{status}")
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
+    // 缓存键：根据套餐ID动态生成，避免缓存穿透
     public Result setStatus(@PathVariable Integer status, Long id) {
         log.info("起售停售套餐：status={}, id={}", status, id);
         setmealService.setStatus(status, id);
@@ -62,6 +72,8 @@ public class SetmealController {
      */
     // @RequestParam：将查询参数 ids 绑定为 List<Long>
     @DeleteMapping
+    @CacheEvict(cacheNames = "setmealCache", allEntries = true)
+    // 缓存键：根据删除的套餐ID列表动态生成，避免缓存穿透
     public Result deleteByIds(@RequestParam List<Long> ids) {
         log.info("批量删除套餐：{}", ids);
         setmealService.deleteByIds(ids);
@@ -78,6 +90,21 @@ public class SetmealController {
         log.info("套餐分页查询：{}", setmealPageQueryDTO);
         PageResult<SetmealVO> pageResult = setmealService.pageQuery(setmealPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 根据分类ID查询套餐列表（下拉框用）。
+     *
+     * @param categoryId 套餐分类ID
+     */
+    @GetMapping("/list")
+    public Result<List<Setmeal>> list(Long categoryId) {
+        log.info("管理端查询套餐列表：categoryId={}", categoryId);
+        Setmeal setmeal = new Setmeal();
+        setmeal.setCategoryId(categoryId);
+
+        List<Setmeal> list = setmealService.list(setmeal);
+        return Result.success(list);
     }
 
     /**

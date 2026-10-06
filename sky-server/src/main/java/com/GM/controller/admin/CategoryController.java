@@ -91,7 +91,7 @@ public class CategoryController {
         return Result.success(category);
     }
 
-    @GetMapping
+    @GetMapping("/list")
     public Result<List<Category>> list(Long type) {
         log.info("管理端查询分类列表：type={}", type);
         Category category = new Category();

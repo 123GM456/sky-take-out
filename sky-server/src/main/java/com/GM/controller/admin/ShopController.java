@@ -34,4 +34,7 @@ public class ShopController {
         log.info("获取店铺营业状态:{}", status==1?"营业":"打烊");
         return Result.success(status);
     }
+
+
+    
 }

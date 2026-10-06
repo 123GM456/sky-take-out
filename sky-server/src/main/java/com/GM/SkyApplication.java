@@ -3,6 +3,7 @@ package com.GM;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * 苍穹外卖后端服务启动入口（Spring Boot 引导类）。
@@ -14,6 +15,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 // @Slf4j：Lombok 注解，自动生成 log（LoggerFactory.getLogger(SkyApplication.class)）
 @Slf4j
+// @EnableCaching：开启缓存功能
+@EnableCaching
 public class SkyApplication {
 
     public static void main(String[] args) {

@@ -1,6 +1,7 @@
 package com.GM.config;
 
 import com.GM.interceptor.JwtTokenAdminInterceptor;
+import com.GM.interceptor.JwtTokenUserInterceptor;
 import com.GM.json.JacksonObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     /** JWT 管理端令牌校验拦截器（用于验证请求是否携带有效 token）*/
     private final JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
+    /** JWT 用户端令牌校验拦截器（用于验证微信小程序请求的登录态）*/
+    private final JwtTokenUserInterceptor jwtTokenUserInterceptor;
+
     /**
      * 注册拦截器并配置拦截规则。
      * <p>所有 /admin/** 开头的请求都需要 JWT 认证，
@@ -42,6 +46,13 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .addPathPatterns("/admin/**")
                 // 排除登录接口（未登录时必须能访问，否则无法获取 token）
                 .excludePathPatterns("/admin/employee/login");
+
+        // 注册用户端 JWT 拦截器
+        registry.addInterceptor(jwtTokenUserInterceptor)
+                // 拦截所有 /user/** 路径的请求（需要微信登录后才能访问）
+                .addPathPatterns("/user/**")
+                // 排除微信登录接口（未登录时必须能访问，否则无法获取 token）
+                .excludePathPatterns("/user/user/login");
     }
 
     /**

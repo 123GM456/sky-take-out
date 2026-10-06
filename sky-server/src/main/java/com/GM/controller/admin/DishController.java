@@ -10,8 +10,10 @@ import com.GM.service.DishService;
 import com.GM.vo.DishVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 管理端 — 菜品管理控制器（Controller 层）。
@@ -25,6 +27,8 @@ public class DishController {
 
     private final DishService dishService;
 
+    private final RedisTemplate<String, Object> redisTemplate;
+
     /**
      * 新增菜品（含口味选项）。
      */
@@ -32,6 +36,8 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}", dishDTO);
         dishService.save(dishDTO);
+        // 新增菜品只影响其所属分类，精确清除该分类的缓存
+        redisTemplate.delete("dish_" + dishDTO.getCategoryId());
         return Result.success();
     }
 
@@ -57,6 +63,8 @@ public class DishController {
     public Result deleteByIds(@RequestParam List<Long> ids) {
         log.info("批量删除菜品：{}", ids);
         dishService.deleteByIds(ids);
+        // 批量删除涉及多个分类，整体清除菜品缓存
+        clearDishCache();
         return Result.success();
     }
 
@@ -67,6 +75,8 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO) {
         log.info("修改菜品：{}", dishDTO);
         dishService.update(dishDTO);
+        // 修改菜品可能更换分类，旧分类缓存无法定位，整体清除菜品缓存
+        clearDishCache();
         return Result.success();
     }
 
@@ -80,6 +90,8 @@ public class DishController {
     public Result setStatus(@PathVariable Integer status, Long id) {
         log.info("起售停售菜品：status={}, id={}", status, id);
         dishService.setStatus(status, id);
+        // 起售/停售只拿到菜品ID，定位其分类需额外查库，整体清除菜品缓存
+        clearDishCache();
         return Result.success();
     }
 
@@ -95,7 +107,7 @@ public class DishController {
     /**
      * 根据类型查询菜品列表（下拉框用）。
      */
-    @GetMapping
+    @GetMapping("/list")
     public Result<List<Dish>> list(Long categoryId) {
         log.info("管理端查询菜品列表：categoryId={}", categoryId);
         Dish dish = new Dish();
@@ -103,6 +115,18 @@ public class DishController {
 
         List<Dish> list = dishService.list(dish);
         return Result.success(list);
+    }
+
+    /**
+     * 清除用户端全部菜品缓存（key 统一以 dish_ 为前缀）。
+     * <p>修改、批量删除、起售/停售会影响多条菜品缓存，且部分场景无法定位分类ID，故整体清除。</p>
+     */
+    private void clearDishCache() {
+        // 匹配所有 dish_ 前缀的缓存 key（用户端 dish_{categoryId}）
+        Set<String> keys = redisTemplate.keys("dish_*");
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
     }
 
 }

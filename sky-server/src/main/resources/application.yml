@@ -1,6 +1,10 @@
 server:
   port: 8080
 
+logging:
+  level:
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -45,7 +49,8 @@ sky:
 
     user-secret-key: sky-take-out-user-secret-key-GM666
     user-ttl: 720000000
-    user-token-name: user-token
+    # 与小程序 utils/request.js 中的请求头保持一致（小程序用 authentication 头携带 token）
+    user-token-name: authentication
   # 微信小程序配置
   wechat:
     app-id: wxb0d179c3dee82381
