@@ -27,4 +27,16 @@ public class MessageConstant {
     /** 用户名重复 */
     public static final String USERNAME_DUPLICATE = "已存在，请重新输入";
 
+    /** 地址簿不存在或不属于当前用户 */
+    public static final String ADDRESS_BOOK_IS_NULL = "地址簿不存在，请重新选择收货地址";
+
+    /** 购物车为空 */
+    public static final String SHOPPING_CART_IS_NULL = "购物车为空，不能下单";
+
+    /** 订单不存在或不属于当前用户 */
+    public static final String ORDER_NOT_FOUND = "订单不存在";
+
+    /** 订单状态异常（当前状态不允许该操作） */
+    public static final String ORDER_STATUS_ERROR = "订单状态异常，无法执行该操作";
+
 }

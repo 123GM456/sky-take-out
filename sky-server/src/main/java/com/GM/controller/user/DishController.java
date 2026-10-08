@@ -28,6 +28,7 @@ public class DishController {
     public Result<List<DishVO>> list(Long categoryId) {
 
         String key = "dish_" + categoryId;
+        
         //查询redis中有无菜品
         List<DishVO> list = (List<DishVO>) redisTemplate.opsForValue().get(key);
         if (list != null && list.size() > 0) {

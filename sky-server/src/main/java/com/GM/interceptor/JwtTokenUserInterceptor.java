@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -46,9 +47,10 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
         // 从请求头中获取 token，key 由 application.yml 中 sky.jwt.user-token-name 指定
         String token = request.getHeader(jwtProperties.getUserTokenName());
 
-        // 请求头中无 token → 返回 401
+        // 请求头中无 token → 返回 401（同时打印实际收到的请求头名，便于定位客户端未发送或名称不匹配）
         if (token == null || token.isEmpty()) {
-            log.warn("用户端请求缺少令牌：{} {}", request.getMethod(), request.getRequestURI());
+            log.warn("用户端请求缺少令牌：{} {}，收到的请求头={}",
+                    request.getMethod(), request.getRequestURI(), Collections.list(request.getHeaderNames()));
             response.setStatus(401);
             return false;
         }

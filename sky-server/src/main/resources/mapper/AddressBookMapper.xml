@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.GM.mapper.AddressBookMapper">
+
+    <!-- 条件查询：按非空字段动态拼接（userId / isDefault） -->
+    <select id="list" parameterType="com.GM.entity.AddressBook" resultType="com.GM.entity.AddressBook">
+        SELECT * FROM address_book
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="isDefault != null">
+                AND is_default = #{isDefault}
+            </if>
+        </where>
+    </select>
+
+    <!-- 新增地址 -->
+    <insert id="insert" parameterType="com.GM.entity.AddressBook" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO address_book (user_id, consignee, phone, sex, province_code, province_name,
+                                  city_code, city_name, district_code, district_name, detail, label,
+                                  is_default, create_time, update_time)
+        VALUES (#{userId}, #{consignee}, #{phone}, #{sex}, #{provinceCode}, #{provinceName},
+                #{cityCode}, #{cityName}, #{districtCode}, #{districtName}, #{detail}, #{label},
+                #{isDefault}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 修改地址：只更新非空字段 -->
+    <update id="update" parameterType="com.GM.entity.AddressBook">
+        UPDATE address_book
+        <set>
+            <if test="consignee != null">consignee = #{consignee},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="provinceCode != null">province_code = #{provinceCode},</if>
+            <if test="provinceName != null">province_name = #{provinceName},</if>
+            <if test="cityCode != null">city_code = #{cityCode},</if>
+            <if test="cityName != null">city_name = #{cityName},</if>
+            <if test="districtCode != null">district_code = #{districtCode},</if>
+            <if test="districtName != null">district_name = #{districtName},</if>
+            <if test="detail != null">detail = #{detail},</if>
+            <if test="label != null">label = #{label},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+    
+    <!-- 按 ID 查询地址：带 user_id 归属校验，防止越权查到他人地址 -->
+    <select id="getById" resultType="com.GM.entity.AddressBook">
+        SELECT * FROM address_book WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <!-- 按 ID 删除地址：带 user_id 归属校验，防止越权删除他人地址 -->
+    <delete id="deleteById">
+        DELETE FROM address_book WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+    <!-- 查询默认地址：带 user_id 归属校验，防止越权查询他人默认地址 -->
+    <select id="getDefault" resultType="com.GM.entity.AddressBook">
+        SELECT * FROM address_book WHERE is_default = 1 AND user_id = #{userId}
+    </select>
+
+    <!-- 将某用户的所有地址设为非默认 -->
+    <update id="updateIsDefaultByUserId" parameterType="com.GM.entity.AddressBook">
+        UPDATE address_book SET is_default = #{isDefault} WHERE user_id = #{userId}
+    </update>
+
+</mapper>

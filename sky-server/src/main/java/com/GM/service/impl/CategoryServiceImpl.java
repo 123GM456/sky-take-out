@@ -1,6 +1,7 @@
 package com.GM.service.impl;
 
 import com.GM.constant.StatusConstant;
+import com.GM.context.BaseContext;
 import com.GM.dto.CategoryDTO;
 import com.GM.dto.CategoryPageQueryDTO;
 import com.GM.entity.Category;
@@ -40,7 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     /**
      * 新增分类。
-     * <p>DTO → Entity 拷贝后，默认启用状态、记录时间戳。</p>
+     * <p>DTO → Entity 拷贝后，默认启用状态、记录时间戳和操作人。</p>
      */
     @Override
     public void save(CategoryDTO categoryDTO) {
@@ -49,18 +50,23 @@ public class CategoryServiceImpl implements CategoryService {
         category.setStatus(StatusConstant.ENABLE);                          // 新增默认启用
         category.setCreateTime(LocalDateTime.now());
         category.setUpdateTime(LocalDateTime.now());
+        // 记录当前登录的管理员 ID 作为创建人和修改人
+        category.setCreateUser(BaseContext.getCurrentId());
+        category.setUpdateUser(BaseContext.getCurrentId());
         categoryMapper.insert(category);
     }
 
     /**
      * 更新分类。
-     * <p>只更新 DTO 中非空字段（XML <set> 动态 SQL 实现），自动补充修改时间。</p>
+     * <p>只更新 DTO 中非空字段（XML <set> 动态 SQL 实现），自动补充修改时间和修改人。</p>
      */
     @Override
     public void update(CategoryDTO categoryDTO) {
         Category category = new Category();
         BeanUtils.copyProperties(categoryDTO, category);
         category.setUpdateTime(LocalDateTime.now());
+        // 记录当前登录的管理员 ID 作为修改人（创建人不变）
+        category.setUpdateUser(BaseContext.getCurrentId());
         categoryMapper.update(category);
     }
 

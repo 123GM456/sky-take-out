@@ -1,6 +1,7 @@
 package com.GM.service.impl;
 
 import com.GM.constant.StatusConstant;
+import com.GM.context.BaseContext;
 import com.GM.dto.DishDTO;
 import com.GM.dto.DishPageQueryDTO;
 import com.GM.entity.Dish;
@@ -46,7 +47,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 新增菜品。
-     * <p>DTO → Entity 拷贝后，记录创建/修改时间。</p>
+     * <p>DTO → Entity 拷贝后，记录创建/修改时间戳和操作人。</p>
      */
     @Override
     public void save(DishDTO dishDTO) {
@@ -55,18 +56,23 @@ public class DishServiceImpl implements DishService {
         dish.setStatus(StatusConstant.ENABLE);
         dish.setCreateTime(LocalDateTime.now());
         dish.setUpdateTime(LocalDateTime.now());
+        // 记录当前登录的管理员 ID 作为创建人和修改人
+        dish.setCreateUser(BaseContext.getCurrentId());
+        dish.setUpdateUser(BaseContext.getCurrentId());
         dishMapper.insert(dish);
     }
 
     /**
      * 更新菜品。
-     * <p>只更新 DTO 中非空字段（XML <set> 动态 SQL 实现），自动补充修改时间。</p>
+     * <p>只更新 DTO 中非空字段（XML <set> 动态 SQL 实现），自动补充修改时间和修改人。</p>
      */
     @Override
     public void update(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
         dish.setUpdateTime(LocalDateTime.now());
+        // 记录当前登录的管理员 ID 作为修改人（创建人不变）
+        dish.setUpdateUser(BaseContext.getCurrentId());
         dishMapper.update(dish);
     }
 

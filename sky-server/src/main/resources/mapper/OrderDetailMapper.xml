@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.GM.mapper.OrderDetailMapper">
+
+    <!-- 批量插入订单明细：单条 INSERT 拼多组 VALUES，减少数据库往返 -->
+    <insert id="insertBatch">
+        INSERT INTO order_detail (name, order_id, dish_id, setmeal_id, dish_flavor, number, amount, image)
+        VALUES
+        <foreach collection="list" item="od" separator=",">
+            (#{od.name}, #{od.orderId}, #{od.dishId}, #{od.setmealId}, #{od.dishFlavor},
+             #{od.number}, #{od.amount}, #{od.image})
+        </foreach>
+    </insert>
+
+    <!-- 按订单 ID 查询明细列表 -->
+    <select id="getByOrderId" resultType="com.GM.entity.OrderDetail">
+        SELECT * FROM order_detail WHERE order_id = #{orderId}
+    </select>
+
+</mapper>
